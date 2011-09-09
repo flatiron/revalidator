@@ -1,0 +1,20 @@
+{
+  "name": "revalidator",
+  "description": "A cross-browser / node.js validator used by resourceful",
+  "version": "0.1.0",
+  "author": "Charlie Robbins <charlie.robbins@gmail.com>",
+  "contributors": [
+    { "name": "Alexis Sellier", "email": "alexis@cloudhead.io" },
+    { "name": "Laurie Harper", "email": "laurie@holoweb.net" }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/flatiron/revalidator.git" 
+  },
+  "devDependencies": {
+    "vows": "0.5.x >=0.5.11"
+  },
+  "main": "./lib/revalidator",
+  "scripts": { "test": "vows test/*-test.js --spec" },
+  "engines": { "node": ">= 0.4.0" }
+}
