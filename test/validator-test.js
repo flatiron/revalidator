@@ -39,24 +39,39 @@ function assertValidates(passingValue, failingValue, attributes) {
     name: 'Resource',
     properties: { field: {} }
   };
+
+  var failing;
+
+  if (!attributes) {
+    attributes = failingValue;
+    failing = false;
+  } else {
+    failing = true;
+  }
+
   var attr = Object.keys(attributes)[0];
   revalidator.mixin(schema.properties.field, attributes); 
 
-  return {
+  var result = {
     "when the object conforms": {
       topic: function () {
         return revalidator.validate({ field: passingValue }, schema);
       },
       "return an object with `valid` set to true": assertValid
-    },
-    "when the object does not conform": {
+    }
+  };
+
+  if (failing) {
+    result["when the object does not conform"] ={
       topic: function () {
         return revalidator.validate({ field: failingValue }, schema);
       },
       "return an object with `valid` set to false": assertInvalid,
       "and an error concerning the attribute":      assertHasError(Object.keys(attributes)[0], 'field')
-    }
+    };
   };
+
+  return result;
 }
 
 vows.describe('revalidator', {
@@ -70,7 +85,7 @@ vows.describe('revalidator', {
     "with <types>:bool,num":  assertValidates (false,     'hello',   { type: ["boolean", "number"] }),
     "with <types>:bool,num":  assertValidates (544,       null,      { type: ["boolean", "number"] }),
     "with <type>:'null'":     assertValidates (null,      false,     { type: "null" }),
-    "with <type>:'any'":      assertValidates (9,         undefined, { type: "any" }),
+    "with <type>:'any'":      assertValidates (9,                    { type: "any" }),
     "with <pattern>":         assertValidates ("kaboom", "42",       { pattern: /^[a-z]+$/ }),
     "with <maxLength>":       assertValidates ("boom",   "kaboom",   { maxLength: 4 }),
     "with <minLength>":       assertValidates ("kaboom", "boom",     { minLength: 6 }),
@@ -191,6 +206,14 @@ vows.describe('revalidator', {
           },
           "return an object with `valid` set to false":       assertInvalid,
           "and an error concerning the 'required' attribute": assertHasError('required')
+        },
+        "and if it has a missing non-required property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            delete object.category;
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertValid
         },
         "and if it has a incorrect pattern property": {
           topic: function (object, schema) {
