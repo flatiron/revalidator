@@ -144,6 +144,8 @@ vows.describe('revalidator', {
         body: { type: 'string' },
         tags: {
           type: 'array',
+          uniqueItems: true,
+          minItems: 2,
           items: {
             type: 'string',
             pattern: /[a-z ]+/
@@ -194,6 +196,22 @@ vows.describe('revalidator', {
           topic: function (object, schema) {
             object = clone(object);
             object._additionalFlag = 'text';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect unique array property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.tags = ['a', 'a'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect array property (< minItems": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.tags = ['x'];
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid
