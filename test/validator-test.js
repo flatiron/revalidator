@@ -67,6 +67,8 @@ vows.describe('revalidator', {
     "with <type>:'array'":    assertValidates ([4, 2],   'hi',       { type: "array" }),
     "with <type>:'object'":   assertValidates ({},        [],        { type: "object" }),
     "with <type>:'boolean'":  assertValidates (false,     42,        { type: "boolean" }),
+    "with <types>:bool,num":  assertValidates (false,     'hello',   { type: ["boolean", "number"] }),
+    "with <types>:bool,num":  assertValidates (544,       null,      { type: ["boolean", "number"] }),
     "with <type>:'null'":     assertValidates (null,      false,     { type: "null" }),
     "with <type>:'any'":      assertValidates (9,         undefined, { type: "any" }),
     "with <pattern>":         assertValidates ("kaboom", "42",       { pattern: /^[a-z]+$/ }),
@@ -77,11 +79,11 @@ vows.describe('revalidator', {
     "with <maximum>":         assertValidates ( 512,      1949,      { maximum:   678 }),
     "with <divisibleBy>":     assertValidates ( 10,       9,         { divisibleBy: 5 }),
     "with <enum>":            assertValidates ("orange",  "cigar",   { enum: ["orange", "apple", "pear"] }),
-    "with <requires>": {
+    "with <dependencies>": {
       topic: {
-        properties: { 
-          town:    { optional: true, requires: "country" },
-          country: { optional: true }
+        properties: {
+          town:    { dependencies: "country" },
+          country: { }
         }
       },
       "when the object conforms": {
@@ -95,7 +97,32 @@ vows.describe('revalidator', {
           return revalidator.validate({ town: "luna" }, schema);
         },
         "return an object with `valid` set to false": assertInvalid,
-        "and an error concerning the attribute":      assertHasError('requires')
+        "and an error concerning the attribute":      assertHasError('dependencies')
+      }
+    },
+    "with <dependencies> as schema": {
+      topic: {
+        properties: {
+          town:    {
+            type: 'string',
+            dependencies: {
+              properties: { x: { type: "number" } }
+            }
+          },
+          country: { }
+        }
+      },
+      "when the object conforms": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna", x: 1 }, schema);
+        },
+        "return an object with `valid` set to true": assertValid,
+      },
+      "when the object does not conform": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna", x: 'no' }, schema);
+        },
+        "return an object with `valid` set to false": assertInvalid
       }
     }
   }
@@ -107,7 +134,6 @@ vows.describe('revalidator', {
         title: {
           type: 'string',
           maxLength: 140,
-          optional: true,
           conditions: {
             optional: function () {
               return !this.published;
@@ -123,9 +149,14 @@ vows.describe('revalidator', {
             pattern: /[a-z ]+/
           }
         },
-        author:    { type: 'string', pattern: /^[\w ]+$/i, optional: false },
+        author:    { type: 'string', pattern: /^[\w ]+$/i, required: true},
         published: { type: 'boolean', 'default': false },
         category:  { type: 'string' }
+      },
+      patternProperties: {
+        '^_': {
+          type: 'boolean', default: false
+        }
       }
     },
     "and an object": {
@@ -136,7 +167,8 @@ vows.describe('revalidator', {
         tags:     ['energy drinks', 'code'],
         author:   'cloudhead',
         published: true,
-        category: 'misc'
+        category: 'misc',
+        _flag: true
       },
       "can be validated with `revalidator.validate`": {
         "and if it conforms": {
@@ -149,14 +181,22 @@ vows.describe('revalidator', {
             assert.isEmpty(res.errors);
           }
         },
-        "and if it has a missing non-optional property": {
+        "and if it has a missing required property": {
           topic: function (object, schema) {
             object = clone(object);
             delete object.author;
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid,
-          "and an error concerning the 'optional' attribute": assertHasError('optional')
+          "and an error concerning the 'required' attribute": assertHasError('required')
+        },
+        "and if it has a incorrect pattern property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object._additionalFlag = 'text';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
         },
         "and if it didn't validate a pattern": {
           topic: function (object, schema) {
