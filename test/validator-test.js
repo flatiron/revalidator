@@ -115,6 +115,28 @@ vows.describe('revalidator', {
         "and an error concerning the attribute":      assertHasError('dependencies')
       }
     },
+    "with <dependencies> as array": {
+      topic: {
+        properties: {
+          town:    { dependencies: ["country", "planet"] },
+          country: { },
+          planet: { }
+        }
+      },
+      "when the object conforms": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna", country: "moon", planet: "mars" }, schema);
+        },
+        "return an object with `valid` set to true": assertValid
+      },
+      "when the object does not conform": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna", planet: "mars" }, schema);
+        },
+        "return an object with `valid` set to false": assertInvalid,
+        "and an error concerning the attribute":      assertHasError('dependencies')
+      }
+    },
     "with <dependencies> as schema": {
       topic: {
         properties: {
