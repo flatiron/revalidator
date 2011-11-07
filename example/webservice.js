@@ -160,25 +160,35 @@ var server = http.createServer(function validateRestRequest (req, res) {
     //  values
     //
     switch (req.method) {
+    
       case "GET":
         res.writeHead(200);
         var result = storedValue.body;
         res.end(JSON.stringify(result));
         return;
+
       case "POST":
         res.writeHead(201);
         res.end();
         memoryStore[requestBody.url] = requestBody;
         return;
+
       case "DELETE":
         delete memoryStore[requestBody.url];
         res.writeHead(200);
         res.end();
         return;
+
       case "PUT":
         memoryStore[requestBody.url] = requestBody;
         res.writeHead(200);
         res.end();
+        return;
+
+      default:
+        res.writeHead(400);
+        res.end('Invalid Http Verb');
+        return;
     }
   });
 })
