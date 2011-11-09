@@ -60,8 +60,8 @@ All tests are written with [vows][0] and should be run with [npm][1]:
   $ npm test
 ```
 
-#### Author: [Charlie Robbins](http://nodejitsu.com)
-#### Contributors: [Fedor Indutny](http://github.com/indutny), [Bradley Meck](http://github.com/bmeck), [Alexis Sellier](http://cloudhead.io), [Laurie Harper](http://laurie.holoweb.net/)
+#### Author: [Charlie Robbins](http://nodejitsu.com), [Alexis Sellier](http://cloudhead.io)
+#### Contributors: [Fedor Indutny](http://github.com/indutny), [Bradley Meck](http://github.com/bmeck), [Laurie Harper](http://laurie.holoweb.net/)
 #### License: Apache 2.0
 
 [0]: http://vowsjs.org
