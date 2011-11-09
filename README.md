@@ -51,7 +51,7 @@ In the browser, the validation function is exposed on `window.validate` by simpl
 ### Installing revalidator
 ``` bash 
   $ [sudo] npm install revalidator
-````
+```
 
 ## Tests
 All tests are written with [vows][0] and should be run with [npm][1]:
