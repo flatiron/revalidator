@@ -1,7 +1,7 @@
 {
   "name": "revalidator",
-  "description": "A cross-browser / node.js validator used by resourceful",
   "version": "0.1.0",
+  "description": "A cross-browser / node.js validator used by resourceful",
   "author": "Charlie Robbins <charlie.robbins@gmail.com>",
   "contributors": [
     { "name": "Alexis Sellier", "email": "alexis@cloudhead.io" },
