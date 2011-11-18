@@ -1,4 +1,4 @@
-# revalidator
+# revalidator [![Build Status](https://secure.travis-ci.org/flatiron/revalidator.png)](http://travis-ci.org/flatiron/revalidator)
 
 A cross-browser / node.js validator used by resourceful and flatiron.
 
