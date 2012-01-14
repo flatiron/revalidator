@@ -1,9 +1,4 @@
-var path = require('path'),
-    sys = require('sys'),
-    assert = require('assert'),
-    events = require('events'),
-    http = require('http'),
-    fs = require('fs'),
+var assert = require('assert'),
     vows = require('vows'),
     revalidator = require('../lib/revalidator');
 
