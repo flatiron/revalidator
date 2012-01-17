@@ -89,6 +89,7 @@ vows.describe('revalidator', {
     "with <maximum>":         assertValidates ( 512,      1949,      { maximum:   678 }),
     "with <divisibleBy>":     assertValidates ( 10,       9,         { divisibleBy: 5 }),
     "with <enum>":            assertValidates ("orange",  "cigar",   { enum: ["orange", "apple", "pear"] }),
+    "with <format>:'url'":    assertValidates ('http://test.com/', 'hello', { format: 'url' }),
     "with <dependencies>": {
       topic: {
         properties: {
