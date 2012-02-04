@@ -196,7 +196,7 @@ vows.describe('revalidator', {
     "and an object": {
       topic: {
         title:    'Gimme some Gurus',
-        date:     new(Date)().toUTCString(),
+        date:     '2012-02-04',
         body:     "And I will pwn your codex.",
         tags:     ['energy drinks', 'code'],
         author:   'cloudhead',
@@ -260,6 +260,14 @@ vows.describe('revalidator', {
           topic: function (object, schema) {
             object = clone(object);
             object.tags = ['x'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect format (date)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.date = 'bad date';
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid
