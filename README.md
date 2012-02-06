@@ -27,7 +27,7 @@ The core of `revalidator` is simple and succinct: `revalidator.validate(obj, sch
         default: null
       }
     }
-  });
+  }));
 ```
 
 This will return with a value indicating if the `obj` conforms to the `schema`. If it does not, a descriptive object will be returned containing the errors encountered with validation.
