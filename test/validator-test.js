@@ -186,7 +186,10 @@ vows.describe('revalidator', {
         },
         author:    { type: 'string', pattern: /^[\w ]+$/i, required: true},
         published: { type: 'boolean', 'default': false },
-        category:  { type: 'string' }
+        category:  { type: 'string' },
+        palindrome: {type: 'string', conform: function(val) {
+          return val == val.split("").reverse().join(""); }
+        }
       },
       patternProperties: {
         '^_': {
@@ -203,6 +206,7 @@ vows.describe('revalidator', {
         author:   'cloudhead',
         published: true,
         category: 'misc',
+        palindrome: 'dennis sinned',
         _flag: true
       },
       "can be validated with `revalidator.validate`": {
@@ -269,6 +273,14 @@ vows.describe('revalidator', {
           topic: function (object, schema) {
             object = clone(object);
             object.date = 'bad date';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it is not a palindrome (conform function)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.palindrome = 'bad palindrome';
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid
