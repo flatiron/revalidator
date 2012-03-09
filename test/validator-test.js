@@ -273,6 +273,14 @@ vows.describe('revalidator', {
           },
           "return an object with `valid` set to false":       assertInvalid
         },
+        "and if it has an impossible format (date)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.date = '2012-43-43';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
         "and if it didn't validate a pattern": {
           topic: function (object, schema) {
             object = clone(object);
