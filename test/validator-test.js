@@ -281,6 +281,22 @@ vows.describe('revalidator', {
           },
           "return an object with `valid` set to false":       assertInvalid
         },
+        "and if it has a bad date time": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.date = '2012-08-08 24:30';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect time": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.date = '25:65';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
         "and if it didn't validate a pattern": {
           topic: function (object, schema) {
             object = clone(object);
