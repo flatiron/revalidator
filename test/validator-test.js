@@ -29,6 +29,15 @@ function assertHasError(attr, field) {
   };
 }
 
+function assertHasErrorMsg(attr, msg) {
+  return function (res) {
+    assert.notEqual(res.errors.length, 0);
+    assert.ok(res.errors.some(function (e) {
+      return e.attribute === attr && e.message === msg;
+    }));
+  };
+}
+
 function assertValidates(passingValue, failingValue, attributes) {
   var schema = {
     name: 'Resource',
@@ -173,7 +182,7 @@ vows.describe('revalidator', {
             }
           }
         },
-        date: { type: 'string', format: 'date' },
+        date: { type: 'string', format: 'date', messages: { format: "must be a valid %{expected} and nothing else" } },
         body: { type: 'string' },
         tags: {
           type: 'array',
@@ -184,7 +193,7 @@ vows.describe('revalidator', {
             pattern: /[a-z ]+/
           }
         },
-        author:    { type: 'string', pattern: /^[\w ]+$/i, required: true},
+        author:    { type: 'string', pattern: /^[\w ]+$/i, required: true, messages: { required: "is essential for survival" } },
         published: { type: 'boolean', 'default': false },
         category:  { type: 'string' }
       },
@@ -223,7 +232,8 @@ vows.describe('revalidator', {
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid,
-          "and an error concerning the 'required' attribute": assertHasError('required')
+          "and an error concerning the 'required' attribute": assertHasError('required'),
+          "and the error message defined":                    assertHasErrorMsg('required', "is essential for survival")
         },
         "and if it has a missing non-required property": {
           topic: function (object, schema) {
@@ -271,31 +281,8 @@ vows.describe('revalidator', {
             object.date = 'bad date';
             return revalidator.validate(object, schema);
           },
-          "return an object with `valid` set to false":       assertInvalid
-        },
-        "and if it has an impossible format (date)": {
-          topic: function (object, schema) {
-            object = clone(object);
-            object.date = '2012-43-43';
-            return revalidator.validate(object, schema);
-          },
-          "return an object with `valid` set to false":       assertInvalid
-        },
-        "and if it has a bad date time": {
-          topic: function (object, schema) {
-            object = clone(object);
-            object.date = '2012-08-08 24:30';
-            return revalidator.validate(object, schema);
-          },
-          "return an object with `valid` set to false":       assertInvalid
-        },
-        "and if it has a incorrect time": {
-          topic: function (object, schema) {
-            object = clone(object);
-            object.date = '25:65';
-            return revalidator.validate(object, schema);
-          },
-          "return an object with `valid` set to false":       assertInvalid
+          "return an object with `valid` set to false":       assertInvalid,
+          "and the error message defined":                    assertHasErrorMsg('format', "must be a valid date and nothing else")
         },
         "and if it didn't validate a pattern": {
           topic: function (object, schema) {
