@@ -184,6 +184,15 @@ vows.describe('revalidator', {
             pattern: /[a-z ]+/
           }
         },
+        tuple: {
+          type: 'array',
+          minItems: 2,
+          maxItems: 2,
+          items: {
+            type: ['string', 'number']
+          }
+        },
+        
         author:    { type: 'string', pattern: /^[\w ]+$/i, required: true},
         published: { type: 'boolean', 'default': false },
         category:  { type: 'string' },
@@ -203,6 +212,7 @@ vows.describe('revalidator', {
         date:     '2012-02-04',
         body:     "And I will pwn your codex.",
         tags:     ['energy drinks', 'code'],
+        tuple:    ['string0', 103],
         author:   'cloudhead',
         published: true,
         category: 'misc',
