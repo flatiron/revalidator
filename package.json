@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "http://github.com/flatiron/revalidator.git" 
+    "url": "http://github.com/flatiron/revalidator.git"
   },
   "devDependencies": {
     "vows": "0.6.x"

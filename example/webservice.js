@@ -42,12 +42,12 @@ var revalidator = require('../'),
 
 var server = http.createServer(function validateRestRequest (req, res) {
   req.method = req.method.toUpperCase();
-  
+
   //
   // Log the requests
   //
   console.log(req.method, req.url);
-  
+
   //
   // Buffer the request so it can be parsed as JSON
   //
@@ -55,12 +55,12 @@ var server = http.createServer(function validateRestRequest (req, res) {
   req.on('data', function addDataToBody (data) {
     requestBody.push(data);
   });
-  
+
   //
   // Once the request has ended work with the body
   //
   req.on('end', function dealWithRest () {
-  
+
     //
     // Parse the JSON
     //
@@ -78,7 +78,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
     else {
       requestBody = {};
     }
-    
+
     //
     // If this was sent to a url but the body url was not declared
     // Make sure the body get the requested url so that our schema
@@ -87,7 +87,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
     if (!requestBody.url) {
       requestBody.url = req.url;
     }
-    
+
     //
     // Don't let users override the main API endpoint
     //
@@ -96,7 +96,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
       res.end('Cannot override the API endpoint "/"');
       return;
     }
-    
+
     //
     // See if our request and target are out of sync
     // This lets us double check the url we are about to take up
@@ -107,7 +107,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
       res.end('Requested url and actual url do not match');
       return;
     }
-    
+
     //
     // Validate the schema
     //
@@ -117,7 +117,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
       res.end(validation.errors.join('\n'));
       return;
     }
-    
+
     //
     // Grab the current value from storage and
     //  check if it is a valid state for REST
@@ -135,7 +135,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
       res.end('DOES NOT EXIST');
       return;
     }
-    
+
     //
     // Check our challenge
     //
@@ -144,7 +144,7 @@ var server = http.createServer(function validateRestRequest (req, res) {
       res.end('NOT AUTHORIZED');
       return;
     }
-    
+
     //
     // Since revalidator only checks and does not manipulate
     //  our object we need to set up the defaults our selves
@@ -154,13 +154,13 @@ var server = http.createServer(function validateRestRequest (req, res) {
     if (requestBody.body === undefined) {
       requestBody.body = schema.properties.body.default;
     }
-    
+
     //
     // Use REST to determine how to manipulate the stored
     //  values
     //
     switch (req.method) {
-    
+
       case "GET":
         res.writeHead(200);
         var result = storedValue.body;

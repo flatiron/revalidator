@@ -54,7 +54,7 @@ function assertValidates(passingValue, failingValue, attributes) {
   }
 
   var attr = Object.keys(attributes)[0];
-  revalidator.mixin(schema.properties.field, attributes); 
+  revalidator.mixin(schema.properties.field, attributes);
 
   var result = {
     "when the object conforms": {
@@ -233,7 +233,7 @@ vows.describe('revalidator', {
           topic: function (object, schema) {
             return revalidator.validate(object, schema);
           },
-          "return an object with the `valid` property set to true": assertValid, 
+          "return an object with the `valid` property set to true": assertValid,
           "return an object with the `errors` property as an empty array": function (res) {
             assert.isArray(res.errors);
             assert.isEmpty(res.errors);
