@@ -95,7 +95,6 @@ vows.describe('revalidator', {
     "with <minLength>":           assertValidates ("kaboom", "boom",     { minLength: 6 }),
     "with <minimum>":             assertValidates ( 512,      43,        { minimum:   473 }),
     "with <maximum>":             assertValidates ( 512,      1949,      { maximum:   678 }),
-    "with <maximum>":             assertValidates ( 512,      1949,      { maximum:   678 }),
     "with <divisibleBy>":         assertValidates ( 10,       9,         { divisibleBy: 5 }),
     "with <divisibleBy> decimal": assertValidates ( 0.2,      0.009,     { divisibleBy: 0.01 }),
     "with <enum>":                assertValidates ("orange",  "cigar",   { enum: ["orange", "apple", "pear"] }),
