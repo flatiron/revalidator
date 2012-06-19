@@ -71,7 +71,7 @@ This will return with a value indicating if the `obj` conforms to the `schema`. 
 #### Available Options
 
 * __validateFormats__: Enforce format constraints (_default true_)
-* __validateFormatsStrict: When `validateFormats` is _true_ treat unrecognized formats as validation errors (_default false_)
+* __validateFormatsStrict__: When `validateFormats` is _true_ treat unrecognized formats as validation errors (_default false_)
 * __validateFormatExtensions__: When `validateFormats` is _true_ also validate formats defined in `validate.formatExtensions` (_default true_)
 
 ### Schema
@@ -87,10 +87,16 @@ If true, the value should not be empty
 #### type
 The `type of value` should be equal to the expected value
 
-Valid types are `string`,`number`,`integer`,`array`,`boolean`,`object`,`null`,`any`
-
 ```js
-{ type: number }
+{ type: 'string' }
+{ type: 'number' }
+{ type: 'integer' }
+{ type: 'array' }
+{ type: 'boolean' }
+{ type: 'object' }
+{ type: 'null' }
+{ type: 'any' }
+{ type: ['boolean', 'string'] }
 ```
 
 #### pattern
