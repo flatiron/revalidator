@@ -259,8 +259,8 @@ We also allow custom message for different constraints
   type: 'string',
   format: 'url'
   messages: {
-    type: 'WOAH! Do you use a number for url in your village?',
-    format: 'DUDE! Its a goddamn url'
+    type: 'Not a string type',
+    format: 'Expected format is a url'
   }
 ```
 
