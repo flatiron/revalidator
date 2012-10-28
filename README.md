@@ -110,14 +110,14 @@ The expected value regex needs to be satisfied by the value
 The length of value must be greater than or equal to expected value
 
 ```js
-{ maxLenght: 8 }
+{ maxLength: 8 }
 ```
 
 #### minLength
 The length of value must be lesser than or equal to expected value
 
 ```js
-{ minLenght: 8 }
+{ minLength: 8 }
 ```
 
 #### minimum
