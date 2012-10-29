@@ -344,28 +344,56 @@ vows.describe('revalidator', {
     "with <cast> option": {
       topic: {
         properties: {
-          question: { type: "string" },
-          answer: { type: "integer" }
+          answer: { type: "integer" },
+          is_ready: { type: "boolean" }
         }
       },
-      "when the property is castable": {
-        topic: function (schema) {
-          return revalidator.validate({ answer: "42" }, schema, { cast: true });
+      "and <integer> property": {
+        "is castable string": {
+          topic: function (schema) {
+            return revalidator.validate({ answer: "42" }, schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
         },
-        "return an object with `valid` set to true": assertValid
+        "is uncastable string": {
+          topic: function (schema) {
+            return revalidator.validate({ answer: "forty2" }, schema, { cast: true });
+          },
+          "return an object with `valid` set to false": assertInvalid
+        }
       },
-      "when the property is uncastable": {
-        topic: function (schema) {
-          return revalidator.validate({ answer: "forty2" }, schema, { cast: true });
+      "and <boolean> property": {
+        "is castable 'true/false' string": {
+          topic: function (schema) {
+            return revalidator.validate({ is_ready: "true" }, schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
         },
-        "return an object with `valid` set to false": assertInvalid
-      },
-      "casting should respect property type": {
-        topic: function (schema) {
-          return revalidator.validate({ question: "42" }, schema, { cast: true });
+        "is castable '1/0' string": {
+          topic: function (schema) {
+            return revalidator.validate({ is_ready: "1" }, schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
         },
-        "return an object with `valid` set to true": assertValid
+        "is castable `1/0` integer": {
+          topic: function (schema) {
+            return revalidator.validate({ is_ready: 1 }, schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
+        },
+        "is uncastable string": {
+          topic: function (schema) {
+            return revalidator.validate({ is_ready: "not yet" }, schema, { cast: true });
+          },
+          "return an object with `valid` set to false": assertInvalid
+        },
+        "is uncastable number": {
+          topic: function (schema) {
+            return revalidator.validate({ is_ready: 42 }, schema, { cast: true });
+          },
+          "return an object with `valid` set to false": assertInvalid
+        }
       }
-    },
+    }
   }
 }).export(module);
