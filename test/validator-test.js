@@ -166,6 +166,11 @@ vows.describe('revalidator', {
         },
         "return an object with `valid` set to false": assertInvalid
       }
+    },
+    "with <type>:'integer' and": {
+      "<minimum> constraints":      assertValidates ( 512,      43,        { minimum:   473, type: 'integer' }),
+      "<maximum> constraints":      assertValidates ( 512,      1949,      { maximum:   678, type: 'integer' }),
+      "<divisibleBy> constraints":  assertValidates ( 10,       9,         { divisibleBy: 5, type: 'integer' })
     }
   }
 }).addBatch({
