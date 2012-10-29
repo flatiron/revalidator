@@ -349,13 +349,13 @@ vows.describe('revalidator', {
         }
       },
       "and <integer> property": {
-        "when castable": {
+        "is castable string": {
           topic: function (schema) {
             return revalidator.validate({ answer: "42" }, schema, { cast: true });
           },
           "return an object with `valid` set to true": assertValid
         },
-        "when uncastable": {
+        "is uncastable string": {
           topic: function (schema) {
             return revalidator.validate({ answer: "forty2" }, schema, { cast: true });
           },
@@ -363,31 +363,31 @@ vows.describe('revalidator', {
         }
       },
       "and <boolean> property": {
-        "when castable as 'true/false' string": {
+        "is castable 'true/false' string": {
           topic: function (schema) {
             return revalidator.validate({ is_ready: "true" }, schema, { cast: true });
           },
           "return an object with `valid` set to true": assertValid
         },
-        "when castable as '1/0' string": {
+        "is castable '1/0' string": {
           topic: function (schema) {
             return revalidator.validate({ is_ready: "1" }, schema, { cast: true });
           },
           "return an object with `valid` set to true": assertValid
         },
-        "when castable as `1/0` integer": {
+        "is castable `1/0` integer": {
           topic: function (schema) {
             return revalidator.validate({ is_ready: 1 }, schema, { cast: true });
           },
           "return an object with `valid` set to true": assertValid
         },
-        "when uncastable as string": {
+        "is uncastable string": {
           topic: function (schema) {
             return revalidator.validate({ is_ready: "not yet" }, schema, { cast: true });
           },
           "return an object with `valid` set to false": assertInvalid
         },
-        "when uncastable as number": {
+        "is uncastable number": {
           topic: function (schema) {
             return revalidator.validate({ is_ready: 42 }, schema, { cast: true });
           },
