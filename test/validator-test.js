@@ -171,6 +171,26 @@ vows.describe('revalidator', {
       "<minimum> constraints":      assertValidates ( 512,      43,        { minimum:   473, type: 'integer' }),
       "<maximum> constraints":      assertValidates ( 512,      1949,      { maximum:   678, type: 'integer' }),
       "<divisibleBy> constraints":  assertValidates ( 10,       9,         { divisibleBy: 5, type: 'integer' })
+    },
+    "with <additionalProperties>:false": {
+      topic: {
+        properties: {
+          town: { type: 'string' }
+        },
+        additionalProperties: false
+      },
+      "when the object conforms": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna" }, schema);
+        },
+        "return an object with `valid` set to true": assertValid
+      },
+      "when the object does not conform": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna", area: 'park' }, schema);
+        },
+        "return an object with `valid` set to false": assertInvalid
+      }
     }
   }
 }).addBatch({
