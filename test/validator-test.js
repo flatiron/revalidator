@@ -340,6 +340,32 @@ vows.describe('revalidator', {
           "and an error concerning the 'pattern' attribute": assertHasError('pattern')
         },
       }
-    }
+    },
+    "with <cast> option": {
+      topic: {
+        properties: {
+          question: { type: "string" },
+          answer: { type: "integer" }
+        }
+      },
+      "when the property is castable": {
+        topic: function (schema) {
+          return revalidator.validate({ answer: "42" }, schema, { cast: true });
+        },
+        "return an object with `valid` set to true": assertValid
+      },
+      "when the property is uncastable": {
+        topic: function (schema) {
+          return revalidator.validate({ answer: "forty2" }, schema, { cast: true });
+        },
+        "return an object with `valid` set to false": assertInvalid
+      },
+      "casting should respect property type": {
+        topic: function (schema) {
+          return revalidator.validate({ question: "42" }, schema, { cast: true });
+        },
+        "return an object with `valid` set to true": assertValid
+      }
+    },
   }
 }).export(module);
