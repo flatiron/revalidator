@@ -1,6 +1,6 @@
 {
   "name": "revalidator",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A cross-browser / node.js validator used by resourceful",
   "author": "Nodejitsu Inc. <info@nodejitsu.com>",
   "maintainers": [
