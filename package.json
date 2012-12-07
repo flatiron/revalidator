@@ -11,6 +11,9 @@
     "type": "git",
     "url": "http://github.com/flatiron/revalidator.git"
   },
+  "dependencies": {
+    "underscore": "1.4.3"
+  },
   "devDependencies": {
     "vows": "0.6.x"
   },
