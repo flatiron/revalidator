@@ -290,8 +290,20 @@ vows.describe('revalidator', {
           "add missing properties to object with default values": function(res){
             assert.ok(res.valid);
             assert.equal(res.target.printed_copies, 100);
-            //assert.ok(typeof res.target.printed_at === string);
             assert.equal(res.target.shipped_copies, 50);
+          }
+        },
+        "and if it has properties not declared in schema":{
+          topic: function(object, schema){
+            var duble = clone(object);
+            duble.not_here = 'ohno';
+            return {
+              valid: revalidator.validate(duble, schema, { deleteUnknowProperties: true }).valid,
+              target: duble
+            }
+          },
+          "it should be removed from object when using strictSchema true": function(res){
+            assert.ok(res.target['not_here'], undefined);
           }
         },
         "and if it has a missing non-required property": {
