@@ -231,7 +231,10 @@ vows.describe('revalidator', {
         category:  { type: 'string' },
         palindrome: {type: 'string', conform: function(val) {
           return val == val.split("").reverse().join(""); }
-        }
+        },
+        printed_at: { type: 'string', default: Date},
+        printed_copies: { type: 'number', default: 100},
+        shipped_copies: { type: 'number', default: function(){return 50}},
       },
       patternProperties: {
         '^_': {
@@ -272,6 +275,37 @@ vows.describe('revalidator', {
           "return an object with `valid` set to false":       assertInvalid,
           "and an error concerning the 'required' attribute": assertHasError('required'),
           "and the error message defined":                    assertHasErrorMsg('required', "is essential for survival")
+        },
+        "and if it has a missing default property": {
+          topic: function (object, schema) {
+            var duble = clone(object);
+            delete duble.printed_copies;
+            delete duble.printed_at;
+            delete duble.shipped_copies;
+            return {
+              valid: revalidator.validate(duble, schema, { addMissingDefaults: true }).valid,
+              target: duble
+            }
+          },
+          "add missing properties to object with default values": function(res){
+            assert.ok(res.valid);
+            assert.equal(res.target.printed_copies, 100);
+            assert.equal(res.target.shipped_copies, 50);
+          }
+        },
+        "and if it has properties not declared in schema":{
+          topic: function(object, schema){
+            var duble = clone(object);
+            duble.not_here = 'ohno';
+            return {
+              valid: revalidator.validate(duble, schema, { deleteUnknowProperties: true }).valid,
+              target: duble
+            }
+          },
+          "it should be removed from object when using strictSchema true": function(res){
+            assert.equal(res.target['not_here'], null);
+            assert.ok(res.valid);
+          }
         },
         "and if it has a missing non-required property": {
           topic: function (object, schema) {
