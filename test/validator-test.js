@@ -303,7 +303,8 @@ vows.describe('revalidator', {
             }
           },
           "it should be removed from object when using strictSchema true": function(res){
-            assert.ok(res.target['not_here'], undefined);
+            assert.equal(res.target['not_here'], null);
+            assert.ok(res.valid);
           }
         },
         "and if it has a missing non-required property": {
