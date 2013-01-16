@@ -231,6 +231,9 @@ vows.describe('revalidator', {
         category:  { type: 'string' },
         palindrome: {type: 'string', conform: function(val) {
           return val == val.split("").reverse().join(""); }
+        },
+        sameAsTitle: {conform: function(val, obj) {
+          return val == obj.title; }
         }
       },
       patternProperties: {
@@ -250,6 +253,7 @@ vows.describe('revalidator', {
         published: true,
         category: 'misc',
         palindrome: 'dennis sinned',
+        sameAsTitle: 'Gimme some Gurus',
         _flag: true
       },
       "can be validated with `revalidator.validate`": {
@@ -329,6 +333,14 @@ vows.describe('revalidator', {
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it didn't validate a custom conform referring to another value in the object": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.sameAsTitle = 'Not the same as the title';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":      assertInvalid
         },
         "and if it didn't validate a pattern": {
           topic: function (object, schema) {
