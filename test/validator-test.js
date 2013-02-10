@@ -393,6 +393,28 @@ vows.describe('revalidator', {
           },
           "return an object with `valid` set to false": assertInvalid
         }
+      },
+      "default true": {
+        topic: function(schema) {
+          revalidator.validate.defaults.cast = true;
+          return schema;
+        },
+        "and no direct <cast> option passed to validate": {
+          "and castable number": {
+            topic: function (schema) {
+              return revalidator.validate({ answer: "42" }, schema);
+            },
+            "return an object with `valid` set to true": assertValid
+          }
+        },
+        "and direct <cast> false passed to validate": {
+          "and castable number": {
+            topic: function (schema) {
+              return revalidator.validate({ answer: "42" }, schema, { cast: false });
+            },
+            "return an object with `valid` set to false": assertInvalid
+          }
+        }
       }
     }
   }
