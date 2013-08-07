@@ -12,7 +12,7 @@
     "url": "http://github.com/flatiron/revalidator.git"
   },
   "devDependencies": {
-    "vows": "0.6.x"
+    "vows": "0.7.0"
   },
   "main": "./lib/revalidator",
   "scripts": {
