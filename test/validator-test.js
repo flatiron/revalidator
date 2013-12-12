@@ -90,6 +90,7 @@ vows.describe('revalidator', {
     "with <types>:bool,num":      assertValidates (544,       null,      { type: ["boolean", "number"] }),
     "with <type>:'null'":         assertValidates (null,      false,     { type: "null" }),
     "with <type>:'any'":          assertValidates (9,                    { type: "any" }),
+    "with <type>:'date'":         assertValidates (new Date(), 'hello',  { type: "date" }),
     "with <pattern>":             assertValidates ("kaboom", "42",       { pattern: /^[a-z]+$/ }),
     "with <maxLength>":           assertValidates ("boom",   "kaboom",   { maxLength: 4 }),
     "with <minLength>":           assertValidates ("kaboom", "boom",     { minLength: 6 }),
