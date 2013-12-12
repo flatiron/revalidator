@@ -232,6 +232,9 @@ vows.describe('revalidator', {
         category:  { type: 'string' },
         palindrome: {type: 'string', conform: function(val) {
           return val == val.split("").reverse().join(""); }
+        },
+        name: { type: 'string', default: '', conform: function(val, data) {
+          return (val === data.author); }
         }
       },
       patternProperties: {
@@ -251,6 +254,7 @@ vows.describe('revalidator', {
         published: true,
         category: 'misc',
         palindrome: 'dennis sinned',
+        name: 'cloudhead',
         _flag: true
       },
       "can be validated with `revalidator.validate`": {
