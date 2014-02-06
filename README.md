@@ -79,10 +79,17 @@ This will return with a value indicating if the `obj` conforms to the `schema`. 
 For a property an `value` is that which is given as input for validation where as an `expected value` is the value of the below fields
 
 #### required
-If true, the value should not be empty
+If true, the value should not be undefined
 
 ```js
 { required: true }
+```
+
+#### allowEmpty
+If false, the value must not be an empty string
+
+```js
+{ allowEmpty: false }
 ```
 
 #### type
