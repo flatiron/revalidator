@@ -366,6 +366,14 @@ vows.describe('revalidator', {
             return revalidator.validate({ answer: "forty2" }, schema, { cast: true });
           },
           "return an object with `valid` set to false": assertInvalid
+        },
+        "is casted to integer": {
+          topic: function (schema) {
+            var object = { answer: "42" };
+            revalidator.validate(object, schema, { cast: true });
+            return object;
+          },
+          "return an object with `answer` set to 42": function(res) { assert.strictEqual(res.answer, 42) }
         }
       },
       "and <boolean> property": {
@@ -398,6 +406,14 @@ vows.describe('revalidator', {
             return revalidator.validate({ is_ready: 42 }, schema, { cast: true });
           },
           "return an object with `valid` set to false": assertInvalid
+        },
+        "is casted to boolean": {
+          topic: function (schema) {
+            var object = { is_ready: "true" };
+            revalidator.validate(object, schema, { cast: true });
+            return object;
+          },
+          "return an object with `is_ready` set to true": function(res) { assert.strictEqual(res.is_ready, true) }
         }
       }
     }
