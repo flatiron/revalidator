@@ -1,6 +1,6 @@
 # revalidator [![Build Status](https://secure.travis-ci.org/flatiron/revalidator.png)](http://travis-ci.org/flatiron/revalidator)
 
-A cross-browser / node.js validator used by resourceful and flatiron.
+A cross-browser / node.js validator used by resourceful and flatiron. Revalidator has [JSONSchema](http://tools.ietf.org/html/draft-zyp-json-schema-04) compatibility as primary goal.
 
 ## Example
 The core of `revalidator` is simple and succinct: `revalidator.validate(obj, schema)`: 
@@ -133,6 +133,13 @@ Value must be lesser than or equal to the expected value
 
 ```js
 { maximum: 10 }
+```
+
+#### allowEmpty
+Value may not be empty
+
+```js
+{ allowEmpty: false }
 ```
 
 #### exclusiveMinimum
