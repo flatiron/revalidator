@@ -2,11 +2,17 @@ var assert = require('assert'),
     vows = require('vows'),
     revalidator = require('../lib/revalidator');
 
-function clone(object) {
-  return Object.keys(object).reduce(function (obj, k) {
-    obj[k] = object[k];
-    return obj;
-  }, {});
+function clone(obj) {
+  if (obj instanceof Array) {
+    return obj.map(function (i) {
+      return clone(i);
+    });
+  } else {
+    return Object.keys(obj).reduce(function (copy, k) {
+      copy[k] = obj[k];
+      return copy;
+    }, {});
+  }
 };
 
 
@@ -523,7 +529,7 @@ vows.describe('revalidator', {
             delete object[1].category;
             return revalidator.validate(object, schema);
           },
-          "return an object with `valid` set to false":       assertValid
+          "return an object with `valid` set to true":       assertValid
         },
         "and if it has a incorrect pattern property": {
           topic: function (object, schema) {
@@ -615,7 +621,7 @@ vows.describe('revalidator', {
             revalidator.validate(object, schema, { cast: true });
             return object;
           },
-          "return an object with `answer` set to 42": function(res) { assert.strictEqual(res.answer, 42) }
+          "return an object with `answer` set to 42": function(res) { assert.strictEqual(res[0].answer, 42) }
         }
       },
       "and <boolean> property": {
