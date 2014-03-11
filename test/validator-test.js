@@ -417,5 +417,247 @@ vows.describe('revalidator', {
         }
       }
     }
+  },
+  'A schema with an array as root element': {
+    topic: {
+      name: 'Array of Articles',
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          title: {
+            type: 'string',
+            maxLength: 140,
+            conditions: {
+              optional: function () {
+                return !this.published;
+              }
+            }
+          },
+          date: { type: 'string', format: 'date', messages: { format: "must be a valid %{expected} and nothing else" } },
+          body: { type: 'string' },
+          tags: {
+            type: 'array',
+            uniqueItems: true,
+            minItems: 2,
+            items: {
+              type: 'string',
+              pattern: /[a-z ]+/
+            }
+          },
+          tuple: {
+            type: 'array',
+            minItems: 2,
+            maxItems: 2,
+            items: {
+              type: ['string', 'number']
+            }
+          },
+          author:    { type: 'string', pattern: /^[\w ]+$/i, required: true, messages: { required: "is essential for survival" } },
+          published: { type: 'boolean', 'default': false },
+          category:  { type: 'string' },
+          palindrome: {type: 'string', conform: function(val) {
+            return val == val.split("").reverse().join(""); }
+          },
+          name: { type: 'string', default: '', conform: function(val, data) {
+            return (val === data.author); }
+          }
+        },
+        patternProperties: {
+          '^_': {
+            type: 'boolean', default: false
+          }
+        }
+      }
+    },
+    "and an array": {
+      topic: [{
+        title:    'Gimme some Gurus',
+        date:     '2012-02-04',
+        body:     "And I will pwn your codex.",
+        tags:     ['energy drinks', 'code'],
+        tuple:    ['string0', 103],
+        author:   'cloudhead',
+        published: true,
+        category: 'misc',
+        palindrome: 'dennis sinned',
+        name: 'cloudhead',
+        _flag: true
+      },{
+        title:    'Gimme some Gurus',
+        date:     '2012-02-04',
+        body:     "And I will pwn your codex.",
+        tags:     ['energy drinks', 'code'],
+        tuple:    ['string0', 103],
+        author:   'cloudhead',
+        published: true,
+        category: 'misc',
+        palindrome: 'dennis sinned',
+        name: 'cloudhead',
+        _flag: true
+      }],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to true": assertValid,
+          "return an object with the `errors` property as an empty array": function (res) {
+            assert.isArray(res.errors);
+            assert.isEmpty(res.errors);
+          }
+        },
+        "and if it has a missing required property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            delete object[1].author;
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid,
+          "and an error concerning the 'required' attribute": assertHasError('required'),
+          "and the error message defined":                    assertHasErrorMsg('required', "is essential for survival")
+        },
+        "and if it has a missing non-required property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            delete object[1].category;
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertValid
+        },
+        "and if it has a incorrect pattern property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1]._additionalFlag = 'text';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect unique array property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].tags = ['a', 'a'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect array property (wrong values)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].tags = ['a', '____'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect array property (< minItems)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].tags = ['x'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect format (date)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].date = 'bad date';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid,
+          "and the error message defined":                    assertHasErrorMsg('format', "must be a valid date and nothing else")
+        },
+        "and if it is not a palindrome (conform function)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].palindrome = 'bad palindrome';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it didn't validate a pattern": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].author = 'email@address.com';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":      assertInvalid,
+          "and an error concerning the 'pattern' attribute": assertHasError('pattern')
+        },
+      }
+    },
+    "with <cast> option": {
+      topic: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            answer: { type: "integer" },
+            is_ready: { type: "boolean" }
+          }
+        }
+      },
+      "and <integer> property": {
+        "is castable string": {
+          topic: function (schema) {
+            return revalidator.validate([{ answer: "42" }], schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
+        },
+        "is uncastable string": {
+          topic: function (schema) {
+            return revalidator.validate([{ answer: "forty2" }], schema, { cast: true });
+          },
+          "return an object with `valid` set to false": assertInvalid
+        },
+        "is casted to integer": {
+          topic: function (schema) {
+            var object = [{ answer: "42" }];
+            revalidator.validate(object, schema, { cast: true });
+            return object;
+          },
+          "return an object with `answer` set to 42": function(res) { assert.strictEqual(res.answer, 42) }
+        }
+      },
+      "and <boolean> property": {
+        "is castable 'true/false' string": {
+          topic: function (schema) {
+            return revalidator.validate([{ is_ready: "true" }], schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
+        },
+        "is castable '1/0' string": {
+          topic: function (schema) {
+            return revalidator.validate([{ is_ready: "1" }], schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
+        },
+        "is castable `1/0` integer": {
+          topic: function (schema) {
+            return revalidator.validate([{ is_ready: 1 }], schema, { cast: true });
+          },
+          "return an object with `valid` set to true": assertValid
+        },
+        "is uncastable string": {
+          topic: function (schema) {
+            return revalidator.validate([{ is_ready: "not yet" }], schema, { cast: true });
+          },
+          "return an object with `valid` set to false": assertInvalid
+        },
+        "is uncastable number": {
+          topic: function (schema) {
+            return revalidator.validate([{ is_ready: 42 }], schema, { cast: true });
+          },
+          "return an object with `valid` set to false": assertInvalid
+        },
+        "is casted to boolean": {
+          topic: function (schema) {
+            var object = [{ is_ready: "true" }];
+            revalidator.validate(object, schema, { cast: true });
+            return object;
+          },
+          "return an object with `is_ready` set to true": function(res) { assert.strictEqual(res[0].is_ready, true) }
+        }
+      }
+    }
   }
 }).export(module);
