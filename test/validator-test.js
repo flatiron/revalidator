@@ -2,9 +2,19 @@ var assert = require('assert'),
     vows = require('vows'),
     revalidator = require('../lib/revalidator');
 
+//- this is a flawed deep clone implemnetation but works for all required tests
 function clone(object) {
   return Object.keys(object).reduce(function (obj, k) {
-    obj[k] = object[k];
+    if (object[k].constructor === Object) {
+      obj[k] = clone(object[k]);
+    } else if (Array.isArray(object[k])) {
+      obj[k] = [];
+      for (var i = object[k].length - 1; i >= 0; i--) {
+        obj[k][i] = (object[k][i].constructor === Object) ? clone(object[k][i]) : object[k][i];
+      }
+    } else {
+      obj[k] = object[k];
+    }
     return obj;
   }, {});
 };
@@ -228,6 +238,19 @@ vows.describe('revalidator', {
             type: ['string', 'number']
           }
         },
+        publisher: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            agents: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: { name: { type: 'string' } }
+              }
+            }
+          }
+        },
         author:    { type: 'string', pattern: /^[\w ]+$/i, required: true, messages: { required: "is essential for survival" } },
         published: { type: 'boolean', 'default': false },
         category:  { type: 'string' },
@@ -251,6 +274,13 @@ vows.describe('revalidator', {
         body:     "And I will pwn your codex.",
         tags:     ['energy drinks', 'code'],
         tuple:    ['string0', 103],
+        publisher:{
+          name: 'jungletours',
+          agents: [
+            { name: 'sandro' },
+            { name: 'jose' }
+          ]
+        },
         author:   'cloudhead',
         published: true,
         category: 'misc',
@@ -268,6 +298,25 @@ vows.describe('revalidator', {
             assert.isArray(res.errors);
             assert.isEmpty(res.errors);
           }
+        },
+        "and if it has a nested object which does not conform": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.publisher.name = null;
+            console.dir(revalidator.validate(object, schema));
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid,
+          "and an error concerning the 'required' attribute": assertHasError('type', 'publisher.name')
+        },
+        "and if it has an object within an array which does not conform": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object.publisher.agents[1] = {name: null};
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid,
+          "and an error concerning the 'required' attribute": assertHasError('type', 'publisher.agents.1.name')
         },
         "and if it has a missing required property": {
           topic: function (object, schema) {
