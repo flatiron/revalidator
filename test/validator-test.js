@@ -303,7 +303,6 @@ vows.describe('revalidator', {
           topic: function (object, schema) {
             object = clone(object);
             object.publisher.name = null;
-            console.dir(revalidator.validate(object, schema));
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid,
