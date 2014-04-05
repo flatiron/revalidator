@@ -3,11 +3,11 @@
 A cross-browser / node.js validator used by resourceful and flatiron. Revalidator has [JSONSchema](http://tools.ietf.org/html/draft-zyp-json-schema-04) compatibility as primary goal.
 
 ## Example
-The core of `revalidator` is simple and succinct: `revalidator.validate(obj, schema)`: 
- 
+The core of `revalidator` is simple and succinct: `revalidator.validate(obj, schema)`:
+
 ``` js
   var revalidator = require('revalidator');
-  
+
   console.dir(revalidator.validate(someObject, {
     properties: {
       url: {
@@ -49,7 +49,7 @@ In the browser, the validation function is exposed on `window.validate` by simpl
 ```
 
 ### Installing revalidator
-``` bash 
+``` bash
   $ [sudo] npm install revalidator
 ```
 
@@ -172,14 +172,14 @@ Value must be divisible by expected value
 ```
 
 #### minItems
-Value must contain more then expected value number of items
+Value must contain more than expected number of items
 
 ```js
 { minItems: 2 }
 ```
 
 #### maxItems
-Value must contains less then expected value number of items
+Value must contain fewer than expected number of items
 
 ```js
 { maxItems: 5 }
@@ -193,7 +193,7 @@ Value must hold a unique set of values
 ```
 
 #### enum
-Value must be present in the array of expected value
+Value must be present in the array of expected values
 
 ```js
 { enum: ['month', 'year'] }
@@ -267,7 +267,7 @@ We also allow nested schema
 ```
 
 ### Custom Messages
-We also allow custom message for different constraints
+We also allow custom messages for different constraints
 
 ```js
 {
