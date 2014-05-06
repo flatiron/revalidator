@@ -303,6 +303,16 @@ vows.describe('revalidator', {
           },
           "return an object with `valid` set to false":       assertInvalid
         },
+        "and if it has a correct array property (uniqueItems false)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            schema = clone(schema);
+            schema.properties.tags.uniqueItems = false;
+            object.tags = ['a', 'a'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertValid
+        },
         "and if it has a incorrect array property (wrong values)": {
           topic: function (object, schema) {
             object = clone(object);
