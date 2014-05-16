@@ -83,6 +83,7 @@ vows.describe('revalidator', {
     "with <type>:'string'":       assertValidates ('hello',   42,        { type: "string" }),
     "with <type>:'number'":       assertValidates (42,       'hello',    { type: "number" }),
     "with <type>:'integer'":      assertValidates (42,        42.5,      { type: "integer" }),
+    "with <type>:'integer'":      assertValidates (10000000000, 10000000000.5,      { type: "integer" }),
     "with <type>:'array'":        assertValidates ([4, 2],   'hi',       { type: "array" }),
     "with <type>:'object'":       assertValidates ({},        [],        { type: "object" }),
     "with <type>:'boolean'":      assertValidates (false,     42,        { type: "boolean" }),
