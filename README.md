@@ -294,7 +294,7 @@ All tests are written with [vows][0] and should be run with [npm][1]:
 ```
 
 #### Author: [Charlie Robbins](http://nodejitsu.com), [Alexis Sellier](http://cloudhead.io)
-#### Contributors: [Fedor Indutny](http://github.com/indutny), [Bradley Meck](http://github.com/bmeck), [Laurie Harper](http://laurie.holoweb.net/)
+#### Contributors: [Fedor Indutny](http://github.com/indutny), [Bradley Meck](http://github.com/bmeck), [Laurie Harper](http://laurie.holoweb.net/), [Martijn Swaagman](http://www.martijnswaagman.nl)
 #### License: Apache 2.0
 
 [0]: http://vowsjs.org
