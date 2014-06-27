@@ -156,7 +156,7 @@ Value must be greater than expected value
 { exclusiveMinimum: 9 }
 ```
 
-### exclusiveMaximum
+#### exclusiveMaximum
 Value must be lesser than expected value
 
 ```js
