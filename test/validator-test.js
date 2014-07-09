@@ -4,6 +4,12 @@ var assert = require('assert'),
 
 //- this is a flawed deep clone implemnetation but works for all required tests
 function clone(object) {
+  if (object instanceof Array) {
+    return object.map(function (element) {
+      return clone(element);
+    });
+  }
+
   return Object.keys(object).reduce(function (obj, k) {
     if (object[k].constructor === Object) {
       obj[k] = clone(object[k]);
@@ -17,7 +23,7 @@ function clone(object) {
     }
     return obj;
   }, {});
-};
+}
 
 
 function assertInvalid(res) {
@@ -83,7 +89,7 @@ function assertValidates(passingValue, failingValue, attributes) {
       "return an object with `valid` set to false": assertInvalid,
       "and an error concerning the attribute":      assertHasError(Object.keys(attributes)[0], 'field')
     };
-  };
+  }
 
   return result;
 }
@@ -93,12 +99,12 @@ vows.describe('revalidator', {
     "with <type>:'string'":       assertValidates ('hello',   42,        { type: "string" }),
     "with <type>:'number'":       assertValidates (42,       'hello',    { type: "number" }),
     "with <type>:'integer'":      assertValidates (42,        42.5,      { type: "integer" }),
-    "with <type>:'integer'":      assertValidates (10000000000, 10000000000.5,      { type: "integer" }),
+    "with <type>:'integer' decimal":      assertValidates (10000000000, 10000000000.5,      { type: "integer" }),
     "with <type>:'array'":        assertValidates ([4, 2],   'hi',       { type: "array" }),
     "with <type>:'object'":       assertValidates ({},        [],        { type: "object" }),
     "with <type>:'boolean'":      assertValidates (false,     42,        { type: "boolean" }),
     "with <types>:bool,num":      assertValidates (false,     'hello',   { type: ["boolean", "number"] }),
-    "with <types>:bool,num":      assertValidates (544,       null,      { type: ["boolean", "number"] }),
+    "with <types>:bool,num 2":      assertValidates (544,       null,      { type: ["boolean", "number"] }),
     "with <type>:'null'":         assertValidates (null,      false,     { type: "null" }),
     "with <type>:'any'":          assertValidates (9,                    { type: "any" }),
     "with <type>:'date'":         assertValidates (new Date(), 'hello',  { type: "date" }),
@@ -241,6 +247,255 @@ vows.describe('revalidator', {
   }
 })
 .addBatch({
+  "An array schema": {
+    topic: {
+      type: 'array',
+      items: {
+        type: 'number'
+      }
+    },
+    "and a valid object object": {
+      topic: [1,2,3],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to true": assertValid,
+          "return an object with the `errors` property as an empty array": function (res) {
+            assert.isArray(res.errors);
+            assert.isEmpty(res.errors);
+          }
+        },
+      }
+    },
+    "and an invalid object": {
+      topic: [1,'a',3],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to false": assertInvalid,
+          "and an error concerning the `type` attribute": assertHasError('type', '1')
+        },
+      }
+    }
+  },
+  "A grid schema": {
+    topic: {
+      type: 'array',
+      items: {
+        type: 'array',
+        maxItems: '2',
+        items: {
+          type: 'null',
+        }
+      }
+    },
+    "and a valid object object": {
+      topic: [[null,null]],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to true": assertValid,
+          "return an object with the `errors` property as an empty array": function (res) {
+            assert.isArray(res.errors);
+            assert.isEmpty(res.errors);
+          }
+        },
+      }
+    },
+    "and an invalid object": {
+      topic: [[null, null, null], [1,'2',true], [null, null, {foo: 'bar'}]],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to false": assertInvalid,
+          "and an error concerning the `type` attribute at 1.1": assertHasError('type', '1.0'),
+          "and an error concerning the `type` attribute at 1.2": assertHasError('type', '1.1'),
+          "and an error concerning the `type` attribute at 1.3": assertHasError('type', '1.2'),
+          "and an error concerning the `type` attribute at 2.2": assertHasError('type', '2.2'),
+          "and an error concerning the `maxItems` attribute at 0": assertHasError('maxItems', '0'),
+          "and an error concerning the `maxItems` attribute at 1": assertHasError('maxItems', '1'),
+          "and an error concerning the `maxItems` attribute at 2": assertHasError('maxItems', '2')
+        },
+      }
+    },
+  },
+  'A schema with an array as root element': {
+    topic: {
+      name: 'Array of Articles',
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          title: {
+            type: 'string',
+            maxLength: 140,
+            conditions: {
+              optional: function () {
+                return !this.published;
+              }
+            }
+          },
+          date: { type: 'string', format: 'date', messages: { format: "must be a valid %{expected} and nothing else" } },
+          body: { type: 'string' },
+          tags: {
+            type: 'array',
+            uniqueItems: true,
+            minItems: 2,
+            items: {
+              type: 'string',
+              pattern: /[a-z ]+/
+            }
+          },
+          tuple: {
+            type: 'array',
+            minItems: 2,
+            maxItems: 2,
+            items: {
+              type: ['string', 'number']
+            }
+          },
+          author:    { type: 'string', pattern: /^[\w ]+$/i, required: true, messages: { required: "is essential for survival" } },
+          published: { type: 'boolean', 'default': false },
+          category:  { type: 'string' },
+          palindrome: {type: 'string', conform: function(val) {
+            return val == val.split("").reverse().join(""); }
+          },
+          name: { type: 'string', default: '', conform: function(val, data) {
+            return (val === data.author); }
+          }
+        },
+        patternProperties: {
+          '^_': {
+            type: 'boolean', default: false
+          }
+        }
+      }
+    },
+    "and an array": {
+      topic: [{
+        title:    'Gimme some Gurus',
+        date:     '2012-02-04',
+        body:     "And I will pwn your codex.",
+        tags:     ['energy drinks', 'code'],
+        tuple:    ['string0', 103],
+        author:   'cloudhead',
+        published: true,
+        category: 'misc',
+        palindrome: 'dennis sinned',
+        name: 'cloudhead',
+        _flag: true
+      },{
+        title:    'Gimme some Gurus',
+        date:     '2012-02-04',
+        body:     "And I will pwn your codex.",
+        tags:     ['energy drinks', 'code'],
+        tuple:    ['string0', 103],
+        author:   'cloudhead',
+        published: true,
+        category: 'misc',
+        palindrome: 'dennis sinned',
+        name: 'cloudhead',
+        _flag: true
+      }],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to true": assertValid,
+          "return an object with the `errors` property as an empty array": function (res) {
+            assert.isArray(res.errors);
+            assert.isEmpty(res.errors);
+          }
+        },
+        "and if it has a missing required property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            delete object[1].author;
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid,
+          "and an error concerning the 'required' attribute": assertHasError('required'),
+          "and the error message defined":                    assertHasErrorMsg('required', "is essential for survival")
+        },
+        "and if it has a missing non-required property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            delete object[1].category;
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertValid
+        },
+        "and if it has a incorrect pattern property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1]._additionalFlag = 'text';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect unique array property": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].tags = ['a', 'a'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect array property (wrong values)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].tags = ['a', '____'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect array property (< minItems)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].tags = ['x'];
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect format (date)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].date = 'bad date';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid,
+          "and the error message defined":                    assertHasErrorMsg('format', "must be a valid date and nothing else")
+        },
+        "and if it is not a palindrome (conform function)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].palindrome = 'bad palindrome';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it didn't validate a pattern": {
+          topic: function (object, schema) {
+            object = clone(object);
+            object[1].author = 'email@address.com';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":      assertInvalid,
+          "and an error concerning the 'pattern' attribute": assertHasError('pattern')
+        }
+      }
+    }
+  }
+}).addBatch({
   "A schema": {
     topic: {
       name: 'Article',
@@ -466,7 +721,7 @@ vows.describe('revalidator', {
             revalidator.validate(object, schema, { cast: true });
             return object;
           },
-          "return an object with `answer` set to 42": function(res) { assert.strictEqual(res.answer, 42) }
+          "return an object with `answer` set to 42": function(res) { assert.strictEqual(res.answer, 42); }
         }
       },
       "and <boolean> property": {
@@ -530,87 +785,6 @@ vows.describe('revalidator', {
             "return an object with `valid` set to false": assertInvalid
           }
         }
-      }
-    }
-  }
-}).addBatch({
-  "An array schema": {
-    topic: {
-      type: 'array',
-      items: {
-        type: 'number'
-      }
-    },
-    "and a valid object object": {
-      topic: [1,2,3],
-      "can be validated with `revalidator.validate`": {
-        "and if it conforms": {
-          topic: function (object, schema) {
-            return revalidator.validate(object, schema);
-          },
-          "return an object with the `valid` property set to true": assertValid,
-          "return an object with the `errors` property as an empty array": function (res) {
-            assert.isArray(res.errors);
-            assert.isEmpty(res.errors);
-          }
-        },
-      }
-    },
-    "and an invalid object": {
-      topic: [1,'a',3],
-      "can be validated with `revalidator.validate`": {
-        "and if it conforms": {
-          topic: function (object, schema) {
-            return revalidator.validate(object, schema);
-          },
-          "return an object with the `valid` property set to false": assertInvalid,
-          "and an error concerning the `type` attribute": assertHasError('type', '1')
-        },
-      }
-    }
-  },
-  "A grid schema": {
-    topic: {
-      type: 'array',
-      items: {
-        type: 'array',
-        maxItems: '2',
-        items: {
-          type: 'null',
-        }
-      }
-    },
-    "and a valid object object": {
-      topic: [[null,null]],
-      "can be validated with `revalidator.validate`": {
-        "and if it conforms": {
-          topic: function (object, schema) {
-            return revalidator.validate(object, schema);
-          },
-          "return an object with the `valid` property set to true": assertValid,
-          "return an object with the `errors` property as an empty array": function (res) {
-            assert.isArray(res.errors);
-            assert.isEmpty(res.errors);
-          }
-        },
-      }
-    },
-    "and an invalid object": {
-      topic: [[null, null, null], [1,'2',true], [null, null, {foo: 'bar'}]],
-      "can be validated with `revalidator.validate`": {
-        "and if it conforms": {
-          topic: function (object, schema) {
-            return revalidator.validate(object, schema);
-          },
-          "return an object with the `valid` property set to false": assertInvalid,
-          "and an error concerning the `type` attribute at 1.1": assertHasError('type', '1.0'),
-          "and an error concerning the `type` attribute at 1.2": assertHasError('type', '1.1'),
-          "and an error concerning the `type` attribute at 1.3": assertHasError('type', '1.2'),
-          "and an error concerning the `type` attribute at 2.2": assertHasError('type', '2.2'),
-          "and an error concerning the `maxItems` attribute at 0": assertHasError('maxItems', '0'),
-          "and an error concerning the `maxItems` attribute at 1": assertHasError('maxItems', '1'),
-          "and an error concerning the `maxItems` attribute at 2": assertHasError('maxItems', '2')
-        },
       }
     }
   }
