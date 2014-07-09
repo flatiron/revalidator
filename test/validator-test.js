@@ -239,7 +239,8 @@ vows.describe('revalidator', {
       }
     }
   }
-}).addBatch({
+})
+.addBatch({
   "A schema": {
     topic: {
       name: 'Article',
@@ -505,7 +506,7 @@ vows.describe('revalidator', {
             revalidator.validate(object, schema, { cast: true });
             return object;
           },
-          "return an object with `is_ready` set to true": function(res) { assert.strictEqual(res.is_ready, true) }
+          "return an object with `is_ready` set to true": function(res) { assert.strictEqual(res.is_ready, true); }
         }
       },
       "default true": {
@@ -529,6 +530,87 @@ vows.describe('revalidator', {
             "return an object with `valid` set to false": assertInvalid
           }
         }
+      }
+    }
+  }
+}).addBatch({
+  "An array schema": {
+    topic: {
+      type: 'array',
+      items: {
+        type: 'number'
+      }
+    },
+    "and a valid object object": {
+      topic: [1,2,3],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to true": assertValid,
+          "return an object with the `errors` property as an empty array": function (res) {
+            assert.isArray(res.errors);
+            assert.isEmpty(res.errors);
+          }
+        },
+      }
+    },
+    "and an invalid object": {
+      topic: [1,'a',3],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to false": assertInvalid,
+          "and an error concerning the `type` attribute": assertHasError('type', '1')
+        },
+      }
+    }
+  },
+  "A grid schema": {
+    topic: {
+      type: 'array',
+      items: {
+        type: 'array',
+        maxItems: '2',
+        items: {
+          type: 'null',
+        }
+      }
+    },
+    "and a valid object object": {
+      topic: [[null,null]],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to true": assertValid,
+          "return an object with the `errors` property as an empty array": function (res) {
+            assert.isArray(res.errors);
+            assert.isEmpty(res.errors);
+          }
+        },
+      }
+    },
+    "and an invalid object": {
+      topic: [[null, null, null], [1,'2',true], [null, null, {foo: 'bar'}]],
+      "can be validated with `revalidator.validate`": {
+        "and if it conforms": {
+          topic: function (object, schema) {
+            return revalidator.validate(object, schema);
+          },
+          "return an object with the `valid` property set to false": assertInvalid,
+          "and an error concerning the `type` attribute at 1.1": assertHasError('type', '1.0'),
+          "and an error concerning the `type` attribute at 1.2": assertHasError('type', '1.1'),
+          "and an error concerning the `type` attribute at 1.3": assertHasError('type', '1.2'),
+          "and an error concerning the `type` attribute at 2.2": assertHasError('type', '2.2'),
+          "and an error concerning the `maxItems` attribute at 0": assertHasError('maxItems', '0'),
+          "and an error concerning the `maxItems` attribute at 1": assertHasError('maxItems', '1'),
+          "and an error concerning the `maxItems` attribute at 2": assertHasError('maxItems', '2')
+        },
       }
     }
   }
