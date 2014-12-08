@@ -1,6 +1,6 @@
 # revalidator [![Build Status](https://secure.travis-ci.org/flatiron/revalidator.png)](http://travis-ci.org/flatiron/revalidator)
 
-A cross-browser / node.js validator used by resourceful and flatiron. Revalidator has [JSONSchema](http://tools.ietf.org/html/draft-zyp-json-schema-04) compatibility as primary goal.
+A cross-browser / node.js validator with [JSONSchema](http://tools.ietf.org/html/draft-zyp-json-schema-04) compatibility as the primary goal.
 
 ## Example
 The core of `revalidator` is simple and succinct: `revalidator.validate(obj, schema)`:
@@ -294,7 +294,7 @@ All tests are written with [vows][0] and should be run with [npm][1]:
   $ npm test
 ```
 
-#### Author: [Charlie Robbins](http://nodejitsu.com), [Alexis Sellier](http://cloudhead.io)
+#### Author: [Charlie Robbins](https://github.com/indexzero), [Alexis Sellier](http://cloudhead.io)
 #### Contributors: [Fedor Indutny](http://github.com/indutny), [Bradley Meck](http://github.com/bmeck), [Laurie Harper](http://laurie.holoweb.net/), [Martijn Swaagman](http://www.martijnswaagman.nl)
 #### License: Apache 2.0
 

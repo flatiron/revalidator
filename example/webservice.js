@@ -1,6 +1,6 @@
 //
-// (C) 2011, Nodejitsu Inc.
-// MIT License
+// (C) 2011, Alexis Sellier, Charlie Robbins, & the Contributors.
+// Apache 2.0
 //
 // A simple web service for storing JSON data via REST
 //

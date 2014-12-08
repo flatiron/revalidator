@@ -1,11 +1,11 @@
 {
   "name": "revalidator",
   "version": "0.3.0",
-  "description": "A cross-browser / node.js validator used by resourceful",
+  "description": "A cross-browser / node.js validator powered by JSON Schema",
   "license": "Apache 2.0",
-  "author": "Nodejitsu Inc. <info@nodejitsu.com>",
+  "author": "Charlie Robbins <charlie.robbins@gmail.com>",
   "maintainers": [
-    "indexzero <charlie@nodejitsu.com>",
+    "cloudhead <alexis@cloudhead.io>",
     "indutny <fedor.indutny@gmail.com>"
   ],
   "repository": {
@@ -13,14 +13,14 @@
     "url": "http://github.com/flatiron/revalidator.git"
   },
   "devDependencies": {
-    "vows": "0.7.0"
+    "vows": "0.8.x"
   },
   "main": "./lib/revalidator",
   "scripts": {
     "test": "vows test/*-test.js --spec"
   },
   "engines": {
-    "node": ">= 0.4.0"
+    "node": ">= 0.8.0"
   }
 }
 
