@@ -68,21 +68,29 @@
     function inputChanged(id, value){
       Model[id] = value;
       var validate = revalidator.validate(Model, schema);
-
-      $('input')
-        .parent()
-        .removeClass('bg-danger text-danger')
-        .addClass('bg-success text-success');
-      $('.err').html('');
-
+      
+      var errFields = [];
       for (var e in validate.errors){
-        $('#' + validate.errors[e].property)
-          .parent()
-          .addClass('bg-danger text-danger')
-          .removeClass('bg-success text-success')
-          .find('.err')
-          .html(validate.errors[e].message);
+        errFields.push(validate.errors[e].property);
       }
+      
+      $('input').each(function(){
+        if (errFields.indexOf(this.id) === -1){
+          $(this)
+            .parent()
+            .removeClass('bg-danger text-danger')
+            .addClass('bg-success text-success')
+            .find('.err')
+            .html('');
+        }else{
+          $(this)
+            .parent()
+            .addClass('bg-danger text-danger')
+            .removeClass('bg-success text-success')
+            .find('.err')
+            .html(validate.errors[errFields.indexOf(this.id)].message);
+        }
+      });
     }
 
     $('input').on('keyup', function(e){
