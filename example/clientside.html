@@ -74,7 +74,7 @@
         errFields.push(validate.errors[e].property);
       }
       
-      $('input').each(function(){
+      $('input.form-control').each(function(){
         if (errFields.indexOf(this.id) === -1){
           $(this)
             .parent()
@@ -93,7 +93,7 @@
       });
     }
 
-    $('input').on('keyup', function(e){
+    $('input.form-control').on('keyup', function(e){
       inputChanged(this.id, this.value);
     });
 
