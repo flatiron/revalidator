@@ -228,6 +228,15 @@ Value must conform to constraint denoted by expected value
 }
 ```
 
+`conform` is also passed the object that is being validated
+
+```js
+{ conform: function (passwordConfirmation, obj) {
+    return passwordConfirmation == obj.password;
+  }
+}
+```
+
 #### dependencies
 Value is valid only if the dependent value is valid
 
