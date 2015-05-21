@@ -13,14 +13,15 @@
     "url": "http://github.com/flatiron/revalidator.git"
   },
   "devDependencies": {
+    "browserify": "^8.1.1",
     "vows": "0.8.x"
   },
   "main": "./lib/revalidator",
   "scripts": {
-    "test": "vows test/*-test.js --spec"
+    "test": "vows test/*-test.js --spec",
+    "browser": "browserify --standalone revalidator ./lib/revalidator.js -o dist/revalidator.js && uglifyjs --compress --mangle -o dist/revalidator.min.js dist/revalidator.js"
   },
   "engines": {
     "node": ">= 0.8.0"
   }
 }
-
