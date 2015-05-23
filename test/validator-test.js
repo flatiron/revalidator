@@ -112,6 +112,7 @@ vows.describe('revalidator', {
     "with <maxLength>":           assertValidates ("boom",   "kaboom",   { maxLength: 4 }),
     "with <minLength>":           assertValidates ("kaboom", "boom",     { minLength: 6 }),
     "with <allowEmpty>":          assertValidates ("hello",  "",         { allowEmpty: false }),
+    "with <allowEmpty>":          assertValidates ("a b",  "  ",         { allowEmpty: false }),
     "with <minimum>":             assertValidates ( 512,      43,        { minimum:   473 }),
     "with <maximum>":             assertValidates ( 512,      1949,      { maximum:   678 }),
     "with <divisibleBy>":         assertValidates ( 10,       9,         { divisibleBy: 5 }),
