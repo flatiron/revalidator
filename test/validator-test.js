@@ -211,6 +211,22 @@ vows.describe('revalidator', {
         "return an object with `valid` set to false": assertInvalid
       }
     },
+    "with <additionalProperties>:schema": {
+      topic: {
+        properties: {
+          town: { type: 'string' }
+        },
+        additionalProperties: {
+          properties: { type: 'string' }
+        }
+      },
+      "when the object conforms": {
+        topic: function (schema) {
+          return revalidator.validate({ town: "luna", area: "park"}, schema);
+        },
+        "return an object with `valid` set to true": assertValid
+      }
+    },
     "with option <additionalProperties>:false": {
       topic: {
         properties: {
