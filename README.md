@@ -101,6 +101,7 @@ The `type of value` should be equal to the expected value
 { type: 'number' }
 { type: 'integer' }
 { type: 'array' }
+{ type: 'date' }
 { type: 'boolean' }
 { type: 'object' }
 { type: 'null' }
