@@ -530,6 +530,7 @@ vows.describe('revalidator', {
         },
         publisher: {
           type: 'object',
+          minItems: 2,
           properties: {
             name: { type: 'string' },
             agents: {
@@ -629,6 +630,14 @@ vows.describe('revalidator', {
           topic: function (object, schema) {
             object = clone(object);
             object._additionalFlag = 'text';
+            return revalidator.validate(object, schema);
+          },
+          "return an object with `valid` set to false":       assertInvalid
+        },
+        "and if it has a incorrect property (< minItems)": {
+          topic: function (object, schema) {
+            object = clone(object);
+            delete object.publisher.name;
             return revalidator.validate(object, schema);
           },
           "return an object with `valid` set to false":       assertInvalid
