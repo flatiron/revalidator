@@ -218,7 +218,7 @@ Value must be a valid format
 ```
 
 #### conform
-Value must conform to constraint denoted by expected value
+Value must conform to constraint denoted by expected value. Value is valid if the function returns a truthy value, and invalid if function returns a falsy value.
 
 ```js
 { conform: function (v) {
